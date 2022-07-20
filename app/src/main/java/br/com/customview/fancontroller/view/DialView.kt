@@ -2,10 +2,9 @@ package br.com.customview.fancontroller.view
 
 import android.content.Context
 import android.graphics.*
-import android.os.Build
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
-import androidx.annotation.RequiresApi
 import br.com.customview.fancontroller.R
 import kotlin.math.cos
 import kotlin.math.min
@@ -19,14 +18,14 @@ private enum class FanSpeed(val label: Int){
     HIGH(R.string.fan_high)
 }
 
-private const val RADIUS_OFFSET_LABEL = 30
-private const val RADIUS_OFFSET_INDICATOR = -35
+private const val RADIUS_OFFSET_LABEL = 120
+private const val RADIUS_OFFSET_INDICATOR = 60
 
 class DialView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-): View(context) {
+): View(context, attrs, defStyleAttr) {
 
     private var radius = 0.0f
     private var fanSpeed = FanSpeed.OFF
@@ -36,14 +35,14 @@ class DialView @JvmOverloads constructor(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
-        textSize = 55.0f
+        textSize = 20.0f
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
     //metodo chamado toda vez que a view precisa redesenhar, aqui e calculado as posicoes dimensoes
     //tudo relacionado a dimensao e o desenho personalizado da view
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        radius = (min(width, height) / 2.0 * 0.8).toFloat()
+        radius = (min(w, h) / 2.0 * 0.8).toFloat()
     }
 
     //funcao de extensao para o PointF, aqui é calculado as coordenadas X e Y para o rotulo
@@ -52,11 +51,12 @@ class DialView @JvmOverloads constructor(
         val startAngle = Math.PI * (9 / 8.0)
         val angle = startAngle + pos.ordinal * (Math.PI / 4)
         x = (radius * cos(angle).toFloat() + width) / 2
-        y = (radius * sin(angle).toFloat() + height / 2)
+        y = (radius * sin(angle).toFloat() + height) / 2
     }
 
     //metodo responsavel por desenhar a view
     override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
         //adiciona a regra para mudar de cor
         paint.color = if (fanSpeed == FanSpeed.OFF ) Color.GRAY else Color.GREEN
         //desenha um circulo com as medidas da View (width e height)
@@ -72,8 +72,10 @@ class DialView @JvmOverloads constructor(
         //etiquetas de velocidade do ventisilva
         val labelRadius = radius + RADIUS_OFFSET_LABEL
         for(i in FanSpeed.values()){
+            Log.i("canvas", "desenhando a posicao $i")
             pointPosition.computeXYForSpeed(i , labelRadius)
             val label = resources.getString(i.label)
+            Log.i("canvas", "valor de canvas ${canvas}")
             canvas?.drawText(label, pointPosition.x, pointPosition.y, paint)
         }
     }
