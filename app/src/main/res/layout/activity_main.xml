@@ -17,6 +17,9 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="24dp"
         android:text="Fan Control"
+        app:fanColor1="#FFEB2B"
+        app:fanColor2="#CCDD30"
+        app:fanColor3="#009688"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

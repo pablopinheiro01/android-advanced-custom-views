@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import br.com.customview.fancontroller.R
 import kotlin.math.cos
 import kotlin.math.min
@@ -35,6 +36,11 @@ class DialView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ): View(context, attrs, defStyleAttr) {
 
+    private var fanSpeedLowColor = 0
+    private var fanSpeedMediumColor = 0
+    private var fanSpeedMaxColor = 0
+
+
     private var radius = 0.0f
     private var fanSpeed = FanSpeed.OFF
 
@@ -49,6 +55,12 @@ class DialView @JvmOverloads constructor(
 
     init {
         isClickable = true //habilita o onclick na view
+
+        context.withStyledAttributes(attrs, R.styleable.DialView){
+            fanSpeedLowColor = getColor(R.styleable.DialView_fanColor1, 0)
+            fanSpeedMediumColor = getColor(R.styleable.DialView_fanColor2, 0 )
+            fanSpeedMaxColor = getColor(R.styleable.DialView_fanColor3, 0 )
+        }
     }
 
     override fun performClick(): Boolean {
@@ -80,8 +92,16 @@ class DialView @JvmOverloads constructor(
     //metodo responsavel por desenhar a view
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        //adiciona a regra para mudar de cor
-        paint.color = if (fanSpeed == FanSpeed.OFF ) Color.GRAY else Color.GREEN
+        //adiciona a regra para mudar de cor - antiga
+//        paint.color = if (fanSpeed == FanSpeed.OFF ) Color.GRAY else Color.GREEN
+        //adiciona a regra para mudar de cor - nova
+        paint.color = when(fanSpeed){
+            FanSpeed.OFF -> Color.GRAY
+            FanSpeed.LOW -> fanSpeedLowColor
+            FanSpeed.MEDIUM -> fanSpeedMediumColor
+            FanSpeed.HIGH -> fanSpeedMaxColor
+        }as Int
+
         //desenha um circulo com as medidas da View (width e height)
         canvas?.drawCircle( (width/2).toFloat(), (height/2).toFloat(), radius, paint)
 
